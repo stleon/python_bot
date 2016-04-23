@@ -13,6 +13,7 @@ class PythonBot(telepot.async.Bot):
     def __init__(self, *args, **kwargs):
         super(PythonBot, self).__init__(*args, **kwargs)
         self._answerer = telepot.async.helper.Answerer(self)
+        self.provider = PythonProvider()
 
     @asyncio.coroutine
     def on_chat_message(self, msg):
@@ -29,6 +30,10 @@ class PythonBot(telepot.async.Bot):
         elif msg['text'] == '/end':
             yield from self.sendMessage(chat_id, 'Nice')
         else:
+            print(msg['text'], '!!!!!!!!')
+            r = self.provider.execute_command(chat_id, msg['text'])
+            yield from self.sendMessage(chat_id, r)
+            '''
             with subprocess.Popen("python3.5",
                                   shell=True,
                                   stdin=subprocess.PIPE,
@@ -38,6 +43,7 @@ class PythonBot(telepot.async.Bot):
                 out, err = p.communicate(msg['text'])
 
             yield from self.sendMessage(chat_id, out + err)
+            '''
 
     def on_callback_query(self, msg):
         query_id, from_id, query_data = telepot.glance(msg,
