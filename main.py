@@ -25,9 +25,6 @@ class PythonBot(telepot.async.Bot):
             yield from self.sendMessage(chat_id, 'Help page')
         elif msg['text'] == '/python':
             pass
-            #provider = PythonProvider()
-            #r = provider.execute_command(user_id=chat_id, command='import this')
-            #yield from self.sendMessage(chat_id, r)
         elif msg['text'] == '/end':
             yield from self.sendMessage(chat_id, 'Nice')
         else:
@@ -40,9 +37,6 @@ class PythonBot(telepot.async.Bot):
                 out, err = p.communicate(msg['text'])
 
             yield from self.sendMessage(chat_id, out + err)
-            #provider = PythonProvider()
-            #r = provider.execute_command(user_id=chat_id, command=msg['text'])
-            #yield from self.sendMessage(chat_id, r)
 
     def on_callback_query(self, msg):
         query_id, from_id, query_data = telepot.glance(msg,
