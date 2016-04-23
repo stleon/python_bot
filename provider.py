@@ -34,7 +34,9 @@ class PythonProvider:
 
     def execute_command(user_id, command):
         """
-        Gets user_id and command name. If connections was closed returns None, else returns command result
+        Executes command for custom user
+        If connections was closed  returns None, 
+        else returns command result
         """
         user_id, command = self.custom_commands(user_id, command)
 
@@ -45,8 +47,7 @@ class PythonProvider:
 
         conn.sendline(command)
 
-        result = ''
-        result += iter(conn.readline())
+        result = ''.join(conn.readline())
         return result
 
 
