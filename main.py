@@ -65,7 +65,7 @@ class PythonBot(telepot.async.Bot):
         print('Chosen Inline Result:', result_id, from_id, query_string)
 
 
-TOKEN = os.getenv('TOKEN')  # sys.argv[1]
+TOKEN = os.getenv('TOKEN')
 
 bot = PythonBot(TOKEN)
 loop = asyncio.get_event_loop()
