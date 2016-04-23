@@ -43,7 +43,7 @@ class PythonProvider:
         if not all([user_id, command]):
             return None
 
-        conn = self.get_user_connection_by(user_id)
+        conn = self.get_connection_by(user_id)
 
         conn.sendline(command)
 
