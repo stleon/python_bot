@@ -5,6 +5,7 @@ import subprocess
 import telepot
 import telepot.async
 
+import commands
 from provider import PythonProvider
 
 
@@ -18,11 +19,11 @@ class PythonBot(telepot.async.Bot):
         content_type, chat_type, chat_id = telepot.glance(msg)
         print('Chat Message:', content_type, chat_type, chat_id, msg)
         if msg['text'] == '/about':
-            yield from self.sendMessage(chat_id, 'About page!')
+            yield from self.sendMessage(chat_id, commands.ABOUT)
         elif msg['text'] == '/ping':
             yield from self.sendMessage(chat_id, 'pong')
         elif msg['text'] == '/help':
-            yield from self.sendMessage(chat_id, 'Help page')
+            yield from self.sendMessage(chat_id, commands.HELP)
         elif msg['text'] == '/python':
             pass
         elif msg['text'] == '/end':
