@@ -14,7 +14,7 @@ import pexpect
 
 class PythonProvider:
     def __init__(self):
-        _connections = {}
+        self._connections = {}
 
     def get_connection_by(self, user_id):
         user_conn = self._connections.get(user_id)
