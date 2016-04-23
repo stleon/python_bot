@@ -45,7 +45,6 @@ class PythonProvider:
             return None
 
         conn = self.get_connection_by(user_id)
-
         command = '\n'.join([command, 'print("EOFLINE")'])
         conn.sendline(command)
 
