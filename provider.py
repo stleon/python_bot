@@ -3,9 +3,8 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
 
-import time
+import re
 import pexpect
-from pexpect.exceptions import TIMEOUT
 
 # Don't do this unless you like being John Malkovich
 # c = pexpect.spawnu('/usr/bin/env python ./python.py')
