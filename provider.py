@@ -32,7 +32,7 @@ class PythonProvider:
 
         return user_id, command
 
-    def execute_command(user_id, command):
+    def execute_command(self, user_id, command):
         """
         Executes command for custom user
         If connections was closed  returns None, 
@@ -40,7 +40,7 @@ class PythonProvider:
         """
         user_id, command = self.custom_commands(user_id, command)
 
-        if not all(user_id, command):
+        if not all([user_id, command]):
             return None
 
         conn = self.get_user_connection_by(user_id)
