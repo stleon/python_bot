@@ -57,8 +57,7 @@ class PythonProvider:
                 break
             result += new_line
 
-        re.sub(r'>>>.+\n', '', result)
-
+        result = re.sub(r'>>>.+\n', '', result)
         return result
 
 if __name__ == '__main__':
