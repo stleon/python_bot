@@ -45,9 +45,9 @@ class PythonProvider:
             return None
 
         conn = self.get_connection_by(user_id)
-        command = '\n\n'.join([command, 'print("EOFLINE")'])
+        command = '{}\n\n{}'.format(command, 'print("EOFLINE")')
         conn.sendline(command)
-        #print('command', command)
+        print('command', command)
 
         result = ''
         while True:
@@ -55,9 +55,10 @@ class PythonProvider:
             if 'EOFLINE' in new_line:
                 new_line = conn.readline()
                 break
+            print(new_line)
             result += new_line
 
-        escaped = re.sub(r'>>>.+\n', '', result)
+        escaped = re.sub(r'>>>.+', '', result)
         if escaped:
             result = escaped
         #print('result', result)
