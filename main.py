@@ -30,7 +30,7 @@ class PythonBot(telepot.async.Bot):
         elif msg['text'] == '/end':
             yield from self.sendMessage(chat_id, 'Nice')
         else:
-            print(msg['text'], '!!!!!!!!')
+            #print(msg['text'], '!!!!!!!!')
             r = self.provider.execute_command(chat_id, msg['text'])
             yield from self.sendMessage(chat_id, r)
             '''
