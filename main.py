@@ -33,42 +33,6 @@ class PythonBot(telepot.async.Bot):
             print(msg['text'], '!!!!!!!!')
             r = self.provider.execute_command(chat_id, msg['text'])
             yield from self.sendMessage(chat_id, r)
-            '''
-            with subprocess.Popen("python3.5",
-                                  shell=True,
-                                  stdin=subprocess.PIPE,
-                                  stdout=subprocess.PIPE,
-                                  stderr=subprocess.PIPE,
-                                  universal_newlines=True) as p:
-                out, err = p.communicate(msg['text'])
-
-            yield from self.sendMessage(chat_id, out + err)
-            '''
-
-    def on_callback_query(self, msg):
-        query_id, from_id, query_data = telepot.glance(msg,
-                                                       flavor='callback_query')
-        print('Callback Query:', query_id, from_id, query_data)
-
-    def on_inline_query(self, msg):
-        query_id, from_id, query_string = telepot.glance(msg,
-                                                         flavor='inline_query')
-        print('Inline Query:', query_id, from_id, query_string)
-
-        def compute_answer():
-            articles = [{'type': 'article',
-                         'id': 'abc',
-                         'title': query_string,
-                         'message_text': query_string}]
-
-            return articles
-
-        self._answerer.answer(msg, compute_answer)
-
-    def on_chosen_inline_result(self, msg):
-        result_id, from_id, query_string = telepot.glance(
-            msg, flavor='chosen_inline_result')
-        print('Chosen Inline Result:', result_id, from_id, query_string)
 
 
 TOKEN = os.getenv('TOKEN')
