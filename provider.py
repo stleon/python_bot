@@ -2,9 +2,10 @@
 from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import unicode_literals
-
 import re
+
 import pexpect
+from pexpect.exceptions import TIMEOUT
 
 # Don't do this unless you like being John Malkovich
 # c = pexpect.spawnu('/usr/bin/env python ./python.py')
@@ -21,6 +22,7 @@ class PythonProvider:
         user_conn = self._connections.get(user_id)
         if not user_conn:
             user_conn = pexpect.spawnu('/usr/bin/env python3')
+            user_conn.expect('>>> ')
             self._connections[user_id] = user_conn
         return user_conn
 
@@ -45,27 +47,34 @@ class PythonProvider:
             return None
 
         conn = self.get_connection_by(user_id)
-        command = '{}\n\n{}'.format(command, 'print("EOFLINE")')
+        # for multilines commands to work correct
+        command = command + conn.linesep
+        lines_count = command.count(conn.linesep)
+
         conn.sendline(command)
-        print('command', command)
+        conn.expect('>>> ')
+        result = conn.before
+        result = conn.linesep.join(result.split(conn.linesep)[lines_count:])
 
-        result = ''
+        # going to the end of flow to avoid redundant new lines at the end of command
+        # example: a=3\n\n\n
         while True:
-            new_line = conn.readline()
-            if 'EOFLINE' in new_line:
-                new_line = conn.readline()
+            try:
+                conn.expect('>>> ', timeout=0.001)
+            except TIMEOUT:
                 break
-            print(new_line)
-            result += new_line
 
-        escaped = re.sub(r'>>>.+', '', result)
-        if escaped:
-            result = escaped
-        #print('result', result)
         return result
+
 
 if __name__ == '__main__':
     provider = PythonProvider()
+    result = provider.execute_command(1, 'a = 3')
+    print(result)
+    result = provider.execute_command(1, '''for i in range(10): \n print(i)''')
+    print(result)
+    result = provider.execute_command(1, 'import this')
+    print(result)
     result = provider.execute_command(1, 'import this')
     print(result)
 
