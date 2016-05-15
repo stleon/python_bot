@@ -21,7 +21,7 @@ class PythonProvider:
     def get_connection_by(self, user_id):
         user_conn = self._connections.get(user_id)
         if not user_conn:
-            user_conn = pexpect.spawnu('/usr/bin/env python3')
+            user_conn = pexpect.spawnu('docker run -ti ubulimit python3')
             user_conn.expect('>>> ')
             self._connections[user_id] = user_conn
         return user_conn
