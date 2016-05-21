@@ -30,20 +30,9 @@ class PythonBot(telepot.async.Bot):
         elif msg['text'] == '/end':
             yield from self.sendMessage(chat_id, 'Nice')
         else:
-            #print(msg['text'], '!!!!!!!!')
-            r = self.provider.execute_command(chat_id, msg['text'])
+            future = loop.run_in_executor(None, self.provider.execute_command, chat_id, msg['text'])
+            r = yield from future
             yield from self.sendMessage(chat_id, r)
-            '''
-            with subprocess.Popen("python3.5",
-                                  shell=True,
-                                  stdin=subprocess.PIPE,
-                                  stdout=subprocess.PIPE,
-                                  stderr=subprocess.PIPE,
-                                  universal_newlines=True) as p:
-                out, err = p.communicate(msg['text'])
-
-            yield from self.sendMessage(chat_id, out + err)
-            '''
 
     def on_callback_query(self, msg):
         query_id, from_id, query_data = telepot.glance(msg,
