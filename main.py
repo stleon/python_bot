@@ -1,9 +1,8 @@
 import os
-import sys
 import asyncio
-import subprocess
 import telepot
 import telepot.async
+from functools import partial
 
 import commands
 from provider import PythonProvider
@@ -30,8 +29,8 @@ class PythonBot(telepot.async.Bot):
         elif msg['text'] == '/end':
             yield from self.sendMessage(chat_id, 'Nice')
         else:
-            #print(msg['text'], '!!!!!!!!')
-            r = self.provider.execute_command(chat_id, msg['text'])
+            r = yield from loop.run_in_executor(None,
+                partial(self.provider.execute_command, chat_id, msg['text']))
             yield from self.sendMessage(chat_id, r)
 
 
