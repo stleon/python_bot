@@ -1,0 +1,38 @@
+FROM python:slim
+RUN apt-get update
+RUN apt-get install -y vim
+RUN apt-get install -y htop
+
+RUN /bin/bash -c 'echo -e "\n\
+ulimit -c 0  # Запрещаем создавать core файлы\n\
+ulimit -d 48000  # Ограничиваем максимальный размер сегмента данных в 48 MB \n\
+ulimit -s 8192  # Ограничиваем максимальный размер стэка в 8 MB \n\
+ulimit -m 48000  # Ограничиваем максимальный размер резидентной части процесса (находящейся в ОЗУ) в  48 MB \n\
+ulimit -u 512  # Ограничиваем максимальное число запущенных этим пользователем процессов. \n\
+ulimit -n 128  # Ограничиваем максимальное число открытых файлов. \n\
+ulimit -f 100000  # Ограничиваем максимальный размер создаваемого файла в 100 MB \n\
+ulimit -v 100000  # Ограничиваем максимальный размер используемой виртуальной памяти в 100 MB" \
+>> /etc/bash.bashrc'
+
+
+RUN /bin/bash -c 'echo -e "\n\
+set editing-mode vi \n\
+set keymap vi \n\
+
+set bell-style none \n\
+$if mode=vi \n\
+    set keymap vi-command \n\
+    "gg": beginning-of-history \n\
+    "G": end-of-history \n\
+    set keymap vi-insert \n\
+    "jj": vi-movement-mode \n\
+    "\C-w": backward-kill-word \n\
+    "\C-p": history-search-backward \n\
+$endif" \
+>> /etc/inputrc'
+
+
+
+#RUN useradd --create-home --shell /bin/bash pythonuser
+#USER pythonuser
+#WORKDIR /home/pythonuser
