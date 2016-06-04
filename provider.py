@@ -35,46 +35,52 @@ class PythonProvider:
 
         return user_id, command
 
-    def execute_command(self, user_id, command):
+    def execute_command(command):
         """
         Executes command for custom user
-        If connections was closed  returns None, 
+        If connections was closed  returns None,
         else returns command result
         """
-        user_id, command = self.custom_commands(user_id, command)
+        msg = cl.execute(command)
+        print("returned by execute")
+        pprint(msg)
 
-        if not all([user_id, command]):
-            return None
-
-        conn = self.get_connection_by(user_id)
-        # for multilines commands to work correct
-        command = command + conn.linesep
-        lines_count = command.count(conn.linesep)
-
-        conn.sendline(command)
-        conn.expect('>>> ')
-        result = conn.before
-        result = conn.linesep.join(result.split(conn.linesep)[lines_count:])
-
-        # going to the end of flow to avoid redundant new lines at the end of command
-        # example: a=3\n\n\n
+        output = ''
         while True:
-            try:
-                conn.expect('>>> ', timeout=0.001)
-            except TIMEOUT:
+            msg = cl.get_iopub_msg()
+            print("read from iopub")
+            #print(msg)
+            if msg['msg_type'] ==  'stream':
+                output += msg['content']['text']
+            elif msg.get('content', {}).get('execution_state') == 'idle':
                 break
+        return output
 
-        return result
 
+    if __name__ == '__main__':
+        result = execute_command('a = 1')
+        print(result)
+        result = execute_command('b = 2\nprint(a)')
+        print(result)
+        result = execute_command('''for i in range(10): \n print(i)''')
+        print(result)
+        result = execute_command('import this')
+        print(result)
+        result = execute_command('import this')
+        print(result)
 
-if __name__ == '__main__':
-    provider = PythonProvider()
-    result = provider.execute_command(1, 'a = 3')
-    print(result)
-    result = provider.execute_command(1, '''for i in range(10): \n print(i)''')
-    print(result)
-    result = provider.execute_command(1, 'import this')
-    print(result)
-    result = provider.execute_command(1, 'import this')
-    print(result)
+        command = 'a=1\nprint(a)\nfrom time import sleep\nsleep(8)\nprint(100)'
+        result = execute_command(command)
+        print(result)
+
+    if __name__ == '__main__':
+        provider = PythonProvider()
+        result = provider.execute_command(1, 'a = 3')
+        print(result)
+        result = provider.execute_command(1, '''for i in range(10): \n print(i)''')
+        print(result)
+        result = provider.execute_command(1, 'import this')
+        print(result)
+        result = provider.execute_command(1, 'import this')
+        print(result)
 
