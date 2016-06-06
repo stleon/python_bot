@@ -11,7 +11,7 @@ class PythonProvider:
         try:
             kernel_manager = self.mk_manager.get_kernel(user_id)
         except KeyError:
-            self.mk_manager.start_kernel(kernel_id=user_id)
+            self.mk_manager.start_kernel(kernel_id=user_id, extra_arguments=['--colors', 'NoColor'])
             kernel_manager = self.mk_manager.get_kernel(user_id)
         user_client = kernel_manager.client()
         return user_client
@@ -36,7 +36,7 @@ class PythonProvider:
         cl = self.get_connection_by(user_id)
         cl.execute(command)
 
-        print('\n{}\n'.format('-'*85))
+        print('\n{}\n'.format('-' * 85))
         print(command)
 
         output = ''
@@ -62,8 +62,6 @@ if __name__ == '__main__':
     print(result)
     result = provider.execute_command(1, 'a')
     print(result)
-
-'''
     result = provider.execute_command(1, 'b = 2\nprint(a)')
     print(result)
     result = provider.execute_command(1, 'for i in range(10): \n print(i)')
@@ -76,4 +74,3 @@ if __name__ == '__main__':
     command = 'a=1\nprint(a)\nfrom time import sleep\nsleep(8)\nprint(100)'
     result = provider.execute_command(1, command)
     print(result)
-'''
