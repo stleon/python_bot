@@ -1,2 +1,2 @@
-#! /usr/bin/bash
-sudo docker build -f Dockerfile -t bot .
+#! /bin/bash
+sudo docker build -f Dockerfile -t jupyter .

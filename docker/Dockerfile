@@ -1,7 +1,8 @@
-FROM python:slim
-RUN apt-get update
+FROM jupyter/demo
 RUN apt-get install -y vim
-RUN apt-get install -y htop
+
+EXPOSE 10001 10002 10003 10004 10005
+
 
 RUN /bin/bash -c 'echo -e "\n\
 ulimit -c 0  # Запрещаем создавать core файлы\n\
@@ -32,7 +33,3 @@ $endif" \
 >> /etc/inputrc'
 
 
-
-#RUN useradd --create-home --shell /bin/bash pythonuser
-#USER pythonuser
-#WORKDIR /home/pythonuser

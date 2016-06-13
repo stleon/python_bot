@@ -1,5 +1,3 @@
-from pprint import pprint
-
 from jupyter_client.multikernelmanager import MultiKernelManager
 
 
@@ -25,8 +23,6 @@ class PythonProvider:
     def execute_command(self, user_id, command):
         """
         Executes command for custom user
-        If connections was closed  returns None,
-        else returns command result
         """
         user_id, command = self.custom_commands(user_id, command)
 
@@ -36,13 +32,9 @@ class PythonProvider:
         cl = self.get_connection_by(user_id)
         cl.execute(command)
 
-        print('\n{}\n'.format('-' * 85))
-        print(command)
-
         output = ''
         while True:
             msg = cl.get_iopub_msg()
-            pprint(msg)
             if msg['msg_type'] == 'execute_result':
                 output += msg['content']['data']['text/plain']
             elif msg['msg_type'] == 'stream':
@@ -71,6 +63,6 @@ if __name__ == '__main__':
     result = provider.execute_command(1, 'import this')
     print(result)
 
-    command = 'a=1\nprint(a)\nfrom time import sleep\nsleep(8)\nprint(100)'
+    command = 'a=1\nprint(a)\nfrom time import sleep\nsleep(3)\nprint(100)'
     result = provider.execute_command(1, command)
     print(result)
