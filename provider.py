@@ -6,6 +6,9 @@ class PythonProvider:
         self.mk_manager = MultiKernelManager()
 
     def get_connection_by(self, user_id):
+        """
+        Use official jupyter client to manage connections.
+        """
         try:
             kernel_manager = self.mk_manager.get_kernel(user_id)
         except KeyError:
