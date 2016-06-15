@@ -1,5 +1,4 @@
 FROM jupyter/demo
-RUN apt-get install -y vim
 
 EXPOSE 10001 10002 10003 10004 10005
 
@@ -14,22 +13,3 @@ ulimit -n 128  # Ограничиваем максимальное число о
 ulimit -f 100000  # Ограничиваем максимальный размер создаваемого файла в 100 MB \n\
 ulimit -v 100000  # Ограничиваем максимальный размер используемой виртуальной памяти в 100 MB" \
 >> /etc/bash.bashrc'
-
-
-RUN /bin/bash -c 'echo -e "\n\
-set editing-mode vi \n\
-set keymap vi \n\
-
-set bell-style none \n\
-$if mode=vi \n\
-    set keymap vi-command \n\
-    "gg": beginning-of-history \n\
-    "G": end-of-history \n\
-    set keymap vi-insert \n\
-    "jj": vi-movement-mode \n\
-    "\C-w": backward-kill-word \n\
-    "\C-p": history-search-backward \n\
-$endif" \
->> /etc/inputrc'
-
-
