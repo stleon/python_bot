@@ -1,2 +1,4 @@
 telepot==7.0
 pexpect==4.0.1
+jupyter==1.0.0
+-e git://github.com/allias888/jupyter_client#egg=jupyter_client
