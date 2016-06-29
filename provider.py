@@ -50,22 +50,26 @@ class PythonProvider:
 
 
 if __name__ == '__main__':
-    provider = PythonProvider()
-    result = provider.execute_command(1, 'asdf')
-    print(result)
-    result = provider.execute_command(1, 'a = 1')
-    print(result)
-    result = provider.execute_command(1, 'a')
-    print(result)
-    result = provider.execute_command(1, 'b = 2\nprint(a)')
-    print(result)
-    result = provider.execute_command(1, 'for i in range(10): \n print(i)')
-    print(result)
-    result = provider.execute_command(1, 'import this')
-    print(result)
-    result = provider.execute_command(1, 'import this')
-    print(result)
+    try:
+        provider = PythonProvider()
+        result = provider.execute_command(1, 'asdf')
+        print(result)
+        result = provider.execute_command(1, 'a = 1')
+        print(result)
+        result = provider.execute_command(1, 'a')
+        print(result)
+        result = provider.execute_command(1, 'b = 2\nprint(a)')
+        print(result)
+        result = provider.execute_command(1, 'for i in range(10): \n print(i)')
+        print(result)
+        result = provider.execute_command(1, 'import this')
+        print(result)
+        result = provider.execute_command(1, 'import this')
+        print(result)
 
-    command = 'a=1\nprint(a)\nfrom time import sleep\nsleep(3)\nprint(100)'
-    result = provider.execute_command(1, command)
-    print(result)
+        command = 'a=1\nprint(a)\nfrom time import sleep\nsleep(3)\nprint(100)'
+        result = provider.execute_command(1, command)
+        print(result)
+    finally:
+        provider.mk_manager.shutdown_all()
+
