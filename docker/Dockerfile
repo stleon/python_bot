@@ -1,5 +1,7 @@
-FROM jupyter/demo
-RUN apt-get install -y vim
+FROM python:slim
+
+RUN pip install jupyter
+RUN apt-get update && apt-get install -y vim
 
 EXPOSE 10001 10002 10003 10004 10005
 
