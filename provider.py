@@ -11,10 +11,13 @@ class PythonProvider:
         """
         try:
             kernel_manager = self.mk_manager.get_kernel(user_id)
+            print('TRY MANAGER ', kernel_manager)
         except KeyError:
-            self.mk_manager.start_kernel(kernel_id=user_id, extra_arguments=['--colors', 'NoColor'])
+            self.mk_manager.start_kernel(kernel_id=user_id)
             kernel_manager = self.mk_manager.get_kernel(user_id)
+            print('EXCEPT MANAGER ', kernel_manager)
         user_client = kernel_manager.client()
+        print('CLIENT MANAGER ', kernel_manager)
         return user_client
 
     def custom_commands(self, user_id, command):
