@@ -12,7 +12,9 @@ class PythonProvider:
         try:
             kernel_manager = self.mk_manager.get_kernel(user_id)
         except KeyError:
-            self.mk_manager.start_kernel(kernel_id=user_id, extra_arguments=['--colors', 'NoColor'])
+            self.mk_manager.start_kernel(
+                kernel_id=user_id,
+                extra_arguments=['--colors', 'NoColor'])
             kernel_manager = self.mk_manager.get_kernel(user_id)
         user_client = kernel_manager.client()
         return user_client
@@ -72,4 +74,3 @@ if __name__ == '__main__':
         print(result)
     finally:
         provider.mk_manager.shutdown_all()
-
