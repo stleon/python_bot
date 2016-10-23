@@ -11,7 +11,6 @@ from provider import PythonProvider
 class PythonBot(telepot.async.Bot):
     def __init__(self, *args, **kwargs):
         super(PythonBot, self).__init__(*args, **kwargs)
-        self._answerer = telepot.async.helper.Answerer(self)
         self.provider = PythonProvider()
 
     @asyncio.coroutine
@@ -24,13 +23,13 @@ class PythonBot(telepot.async.Bot):
             yield from self.sendMessage(chat_id, 'pong')
         elif msg['text'] == '/help':
             yield from self.sendMessage(chat_id, commands.HELP)
-        elif msg['text'] == '/python':
-            pass
-        elif msg['text'] == '/end':
-            yield from self.sendMessage(chat_id, 'Nice')
+        elif msg['text'] == '/restart':
+            r = yield from loop.run_in_executor(None,
+                    self.provider.restart(chat_id))
+            yield from self.sendMessage(chat_id, r)
         else:
             r = yield from loop.run_in_executor(None,
-                partial(self.provider.execute_command, chat_id, msg['text']))
+                partial(self.provider.execute, chat_id, msg['text']))
             yield from self.sendMessage(chat_id, r)
 
 
