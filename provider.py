@@ -1,79 +1,80 @@
-#!/usr/bin/env python
-from __future__ import absolute_import
-from __future__ import print_function
-from __future__ import unicode_literals
+from jupyter_client.multikernelmanager import MultiKernelManager
 
-import pexpect
-from pexpect.exceptions import TIMEOUT
-
-# Don't do this unless you like being John Malkovich
-# c = pexpect.spawnu('/usr/bin/env python ./python.py')
-
-# Note that, for Python 3 compatibility reasons, we are using spawnu and
-# importing unicode_literals (above). spawnu accepts Unicode input and
-# unicode_literals makes all string literals in this script Unicode by default.
 
 class PythonProvider:
     def __init__(self):
-        self._connections = {}
+        self.mk_manager = MultiKernelManager()
 
-    def get_connection_by(self, user_id):
-        user_conn = self._connections.get(user_id)
-        if not user_conn:
-            user_conn = pexpect.spawnu('/usr/bin/env python3')
-            user_conn.expect('>>> ')
-            self._connections[user_id] = user_conn
-        return user_conn
+    def start(self, user_id):
+        """
+        Runs jupyter kernel in new container
+        """
+        self.mk_manager.start_kernel(kernel_id=user_id)
 
-    def custom_commands(self, user_id, command):
-        if command == 'exit()':
-            conn = self.get_connection_by(user_id)
-            conn.kill(0)
-            del self._connections[user_id]
-            user_id, command = None, None
+    def restart(self, user_id):
+        """
+        Restarts jupyter kernel
+        """
+        self.mk_manager.shutdown_kernel(user_id)
+        self.start(user_id)
 
-        return user_id, command
+    def get_client_by(self, user_id):
+        """
+        Get client connected to kernel
+        """
+        try:
+            kernel_manager = self.mk_manager.get_kernel(user_id)
+        except KeyError:
+            self.start(user_id)
+            kernel_manager = self.mk_manager.get_kernel(user_id)
+        return kernel_manager.client()
 
-    def execute_command(self, user_id, command):
+    def execute(self, user_id, command):
         """
         Executes command for custom user
-        If connections was closed  returns None, 
+        If connections was closed  returns None,
         else returns command result
         """
-        user_id, command = self.custom_commands(user_id, command)
-
-        if not all([user_id, command]):
+        if not all((user_id, command)):
             return None
 
-        conn = self.get_connection_by(user_id)
-        # for multilines commands to work correct
-        command = command + conn.linesep
-        lines_count = command.count(conn.linesep)
+        client = self.get_client_by(user_id)
+        client.execute(command)
 
-        conn.sendline(command)
-        conn.expect('>>> ')
-        result = conn.before
-        result = conn.linesep.join(result.split(conn.linesep)[lines_count:])
-
-        # going to the end of flow to avoid redundant new lines at the end of command
-        # example: a=3\n\n\n
+        output = ''
         while True:
-            try:
-                conn.expect('>>> ', timeout=0.001)
-            except TIMEOUT:
+            msg = client.get_iopub_msg()
+            if msg['msg_type'] == 'execute_result':
+                output += msg['content']['data']['text/plain']
+            elif msg['msg_type'] == 'stream':
+                output += msg['content']['text']
+            elif msg['msg_type'] == 'error':
+                output += '\n'.join(msg['content']['traceback'])
+            elif msg.get('content', {}).get('execution_state') == 'idle':
                 break
-
-        return result
+        return output
 
 
 if __name__ == '__main__':
-    provider = PythonProvider()
-    result = provider.execute_command(1, 'a = 3')
-    print(result)
-    result = provider.execute_command(1, '''for i in range(10): \n print(i)''')
-    print(result)
-    result = provider.execute_command(1, 'import this')
-    print(result)
-    result = provider.execute_command(1, 'import this')
-    print(result)
+    try:
+        provider = PythonProvider()
+        result = provider.execute_command(1, 'asdf')
+        print(result)
+        result = provider.execute_command(1, 'a = 1')
+        print(result)
+        result = provider.execute_command(1, 'a')
+        print(result)
+        result = provider.execute_command(1, 'b = 2\nprint(a)')
+        print(result)
+        result = provider.execute_command(1, 'for i in range(10): \n print(i)')
+        print(result)
+        result = provider.execute_command(1, 'import this')
+        print(result)
+        result = provider.execute_command(1, 'import this')
+        print(result)
 
+        command = 'a=1\nprint(a)\nfrom time import sleep\nsleep(3)\nprint(100)'
+        result = provider.execute_command(1, command)
+        print(result)
+    finally:
+        provider.mk_manager.shutdown_all()
