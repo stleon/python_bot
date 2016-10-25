@@ -5,39 +5,46 @@ class PythonProvider:
     def __init__(self):
         self.mk_manager = MultiKernelManager()
 
-    def get_connection_by(self, user_id):
+    def start(self, user_id):
         """
-        Use official jupyter client to manage connections.
+        Runs jupyter kernel in new container
+        """
+        self.mk_manager.start_kernel(kernel_id=user_id)
+
+    def restart(self, user_id):
+        """
+        Restarts jupyter kernel
+        """
+        self.mk_manager.shutdown_kernel(user_id)
+        self.start(user_id)
+
+    def get_client_by(self, user_id):
+        """
+        Get client connected to kernel
         """
         try:
             kernel_manager = self.mk_manager.get_kernel(user_id)
         except KeyError:
-            self.mk_manager.start_kernel(kernel_id=user_id, extra_arguments=['--colors', 'NoColor'])
+            self.start(user_id)
             kernel_manager = self.mk_manager.get_kernel(user_id)
-        user_client = kernel_manager.client()
-        return user_client
+        return kernel_manager.client()
 
-    def custom_commands(self, user_id, command):
-        if command == 'exit()':
-            self.mk_manager.shutdown_kernel(user_id)
-            user_id, command = None, None
-        return user_id, command
-
-    def execute_command(self, user_id, command):
+    def execute(self, user_id, command):
         """
         Executes command for custom user
+        If connections was closed  returns None,
+        else returns command result
         """
-        user_id, command = self.custom_commands(user_id, command)
-
         if not all((user_id, command)):
             return None
 
-        cl = self.get_connection_by(user_id)
-        cl.execute(command)
+        client = self.get_client_by(user_id)
+        client.execute(command)
 
         output = ''
         while True:
-            msg = cl.get_iopub_msg()
+            msg = client.get_iopub_msg()
+
             if msg['msg_type'] == 'execute_result':
                 output += msg['content']['data']['text/plain']
             elif msg['msg_type'] == 'stream':
@@ -46,6 +53,7 @@ class PythonProvider:
                 output += '\n'.join(msg['content']['traceback'])
             elif msg.get('content', {}).get('execution_state') == 'idle':
                 break
+
         return output
 
 
@@ -72,4 +80,3 @@ if __name__ == '__main__':
         print(result)
     finally:
         provider.mk_manager.shutdown_all()
-

@@ -1,2 +1,2 @@
 #! /bin/bash
-sudo bash -c 'source token && python3 main.py'
+source token && source venv/bin/activate && python3 main.py
